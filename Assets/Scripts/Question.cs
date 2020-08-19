@@ -9,29 +9,61 @@ public class Question : MonoBehaviour
     private TextAsset questionsTexts;
 
     [SerializeField]
+    private TextAsset answersTexts;
+
+    [SerializeField]
     private TextMeshProUGUI textComponent;
+    
+    [SerializeField]
+    private LeanTweenType easeType;
+
+    [SerializeField]
+    private TextMeshProUGUI[] answerComps;
 
     private string questionsString;
 
-    private int currentQuestion;
+    private string answersString;
+
+    private RectTransform textRect;
 
     private void Awake() {
-        currentQuestion = 1;
         questionsString = questionsTexts.text;
-        textComponent.SetText(GetLine(questionsString, currentQuestion));
+        answersString = answersTexts.text;
+        textComponent.gameObject.SetActive(false);
+        textRect = textComponent.rectTransform;
+
     }
 
-    public void NextQuestion() {
-        currentQuestion++;
-        textComponent.SetText(GetLine(questionsString, currentQuestion));
+    public void StartQs() {
+        textComponent.SetText(GetLine(questionsString, 1));
+        SetAnswers(1);
+        textComponent.gameObject.SetActive(true);
     }
 
-    /// <summary>
-    /// Taken from https://stackoverflow.com/questions/2606368/how-to-get-specific-line-from-a-string-in-c
-    /// </summary>
-    private string GetLine(string text, int lineNo)
-    {
+    public void NextQuestion(int qNumb) {
+        LeanTween.moveX(textRect, 710f, 1f).setEase(easeType).setOnComplete(() =>
+        {
+            textComponent.SetText(GetLine(questionsString, qNumb));
+            textRect.anchoredPosition *= new Vector3(-1, 1, 1);
+            LeanTween.moveX(textRect, 0f, 1f).setEase(easeType);
+            SetAnswers(qNumb);
+        });
+    }
+
+    private string GetLine(string text, int lineNo) {
         string[] lines = text.Replace("\r","").Split('\n');
         return lines.Length >= lineNo ? lines[lineNo-1] : null;
+    }
+
+    private string[] GetAnswers(string text, int lineNo) {
+        string[] lines = text.Replace("\r","").Split('\n');
+        return (lines.Length >= lineNo ? lines[lineNo-1] : "").Split(' ');
+    }
+
+    private void SetAnswers(int lineNo) {
+        string[] answers = GetAnswers(answersString, lineNo);
+        for (int i = 0; i < answerComps.Length; i++) {
+            answerComps[i].SetText(answers[i]);
+        }
     }
 }
