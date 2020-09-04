@@ -1,5 +1,12 @@
-ciao giorgio
-si no
-forse quasi
-zio dai
-porca puttana
+dog cat
+few many
+no yes
+yes no
+no yes
+no yes
+no yes
+yes no
+no yes
+yes no
+no yes
+blue red

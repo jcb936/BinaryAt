@@ -1,4 +1,12 @@
-question 1: ciao come stai
-question 2: no non mi piace sta roba
-question 3: no vabbe
-question 4: si mi piace
+question 1: what is your favourite animal
+question 2: how many children do you want to have
+question 3: have you met the love of your life already?
+question 4: boys should be boys
+question 5: girls should be girls
+question 6: you like looking at yourself in the mirror
+question 7: you like looking at your body
+question 8: being short is a bad thing
+question 9: your significant other should be taller than you
+question 10: women should be faithful
+question 11: men should be faithful
+question 12: what is your favourite colour?

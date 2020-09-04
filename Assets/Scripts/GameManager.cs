@@ -36,6 +36,20 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI titleText;
 
+    [SerializeField]
+    private TextAsset comments;
+
+    [SerializeField]
+    private TextMeshProUGUI finalText;
+
+    [SerializeField]
+    private GameObject finalPanel;
+
+    [SerializeField]
+    private GameObject redWinText;
+
+    [SerializeField]
+    private GameObject blueWinText;
     private int currentQuestion;
 
     private int totalQs;
@@ -45,7 +59,7 @@ public class GameManager : MonoBehaviour
     private int redScore;
 
     private void Awake() {
-        totalQs = 3;
+        totalQs = 12;
         currentQuestion = 1;
         blueChoice.onClick.AddListener(() => StartCoroutine(StartGame()));
         redChoice.onClick.AddListener(() => Application.Quit());
@@ -60,23 +74,28 @@ public class GameManager : MonoBehaviour
         blueChoice.gameObject.SetActive(false);
         redChoice.gameObject.SetActive(false);
 
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(3f);
 
         titleText.SetText("we are going to start the test now");
 
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(2f);
 
         titleText.gameObject.SetActive(false);
 
         questionObject.StartQs();
 
-        blueChoice.onClick.AddListener(MoveBlue);
-        redChoice.onClick.AddListener(MoveRed);
+        blueChoice.onClick.AddListener(() => Chosen(true));
+        redChoice.onClick.AddListener(() => Chosen(false));
 
         blueChoice.gameObject.SetActive(true);
         redChoice.gameObject.SetActive(true);
+    }
 
-
+    private void Chosen(bool isBlue) {
+        if ((isBlue && questionObject.UpIsBlue) || (!isBlue && !questionObject.UpIsBlue))
+            MoveBlue();
+        else
+            MoveRed();
 
     }
 
@@ -91,19 +110,36 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        var toResize = redScore > blueScore ? redSquare : blueSquare;
+        questionObject.gameObject.SetActive(false);
+        redChoice.gameObject.SetActive(false);
+        blueChoice.gameObject.SetActive(false);
+        RectTransform toResize;
+        if (redScore > blueScore) {
+            redWinText.SetActive(true);
+            toResize = redSquare;
+            redSquare.SetSiblingIndex(redSquare.GetSiblingIndex() + 1);
+        } else {
+            blueWinText.SetActive(true);
+            toResize = blueSquare;
+        }
         LeanTween.size(toResize, new Vector2(5000, 5000), 3f);
         LeanTween.alpha(toResize, 1f, 1f);
     }
 
     private void No() {
-
+        finalText.SetText(GetHate(comments.text));
+        finalPanel.SetActive(true);
     }
 
     private void MoveBlue() {
         blueScore++;
-        LeanTween.moveX(blueSquare, blueSquare.anchoredPosition.x - 20f, 0.5f);
-        if (currentQuestion <= totalQs)
+        blueChoice.interactable = false;
+        redChoice.interactable = false;
+        LeanTween.moveX(blueSquare, blueSquare.anchoredPosition.x - 40f, 1.1f).setOnComplete(() => {
+            blueChoice.interactable = true;
+            redChoice.interactable = true;
+        });
+        if (currentQuestion < totalQs)
             Next();
         else
             End();
@@ -111,10 +147,20 @@ public class GameManager : MonoBehaviour
 
     private void MoveRed() {
         redScore++;
-        LeanTween.moveX(redSquare, redSquare.anchoredPosition.x + 20, 0.5f);
-        if (currentQuestion <= totalQs)
+        blueChoice.interactable = false;
+        redChoice.interactable = false;
+        LeanTween.moveX(redSquare, redSquare.anchoredPosition.x + 40, 1.1f).setOnComplete(() => {
+            blueChoice.interactable = true;
+            redChoice.interactable = true;
+        });
+        if (currentQuestion < totalQs)
             Next();
         else
             End();
+    }
+
+    private string GetHate(string text) {
+        string[] lines = text.Replace("\r","").Split("\n---\n".ToCharArray());
+        return lines[Random.Range(0, lines.Length)];
     }
 }

@@ -13,7 +13,7 @@ public class Question : MonoBehaviour
 
     [SerializeField]
     private TextMeshProUGUI textComponent;
-    
+
     [SerializeField]
     private LeanTweenType easeType;
 
@@ -25,6 +25,8 @@ public class Question : MonoBehaviour
     private string answersString;
 
     private RectTransform textRect;
+
+    public bool UpIsBlue { get; private set; }
 
     private void Awake() {
         questionsString = questionsTexts.text;
@@ -41,11 +43,11 @@ public class Question : MonoBehaviour
     }
 
     public void NextQuestion(int qNumb) {
-        LeanTween.moveX(textRect, 710f, 1f).setEase(easeType).setOnComplete(() =>
+        LeanTween.moveX(textRect, 710f, 0.5f).setEase(easeType).setOnComplete(() =>
         {
             textComponent.SetText(GetLine(questionsString, qNumb));
             textRect.anchoredPosition *= new Vector3(-1, 1, 1);
-            LeanTween.moveX(textRect, 0f, 1f).setEase(easeType);
+            LeanTween.moveX(textRect, 0f, 0.5f).setEase(easeType);
             SetAnswers(qNumb);
         });
     }
@@ -62,8 +64,9 @@ public class Question : MonoBehaviour
 
     private void SetAnswers(int lineNo) {
         string[] answers = GetAnswers(answersString, lineNo);
-        for (int i = 0; i < answerComps.Length; i++) {
-            answerComps[i].SetText(answers[i]);
-        }
+        int randomAnswer = Random.Range(0, 2);
+        UpIsBlue = randomAnswer == 0;
+        answerComps[0].SetText(answers[randomAnswer]);
+        answerComps[1].SetText(answers[(randomAnswer + 1) % answers.Length]);
     }
 }
